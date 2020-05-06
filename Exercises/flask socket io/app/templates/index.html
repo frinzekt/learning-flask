@@ -17,7 +17,6 @@
 		<input type="submit" value="Join Room" />
 	</form>
 	<form id="leave" method="POST" action="#">
-		<input type="text" name="leave_room" id="leave_room" placeholder="Room Name" />
 		<input type="submit" value="Leave Room" />
 	</form>
 	<form id="send_room" method="POST" action="#">
@@ -32,6 +31,7 @@
 <script>
 	$(document).ready(function () {
 		simulatedUserId = Math.round(Math.random() * 10);
+		var room = '';
 		$('#id').append('<p> ID:' + simulatedUserId + '</p>');
 
 		var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
@@ -40,7 +40,7 @@
 			$('#log').append('<p>Received: ' + msg.data + '</p>');
 		});
 		socket.on('connect', function () {
-			socket.emit('my_event', { data: "I'm connected! ", userId: simulatedUserId });
+			socket.emit('connectFirstTime', { data: "I'm connected! ", userId: simulatedUserId });
 		});
 		// Handlers for the different forms in the page.
 		// These accept data from the user and send it to the server in a
@@ -54,11 +54,12 @@
 			return false;
 		});
 		$('form#join').submit(function (event) {
+			room = $('#join_room').val();
 			socket.emit('join', { room: $('#join_room').val() });
 			return false;
 		});
 		$('form#leave').submit(function (event) {
-			socket.emit('leave', { room: $('#leave_room').val() });
+			socket.emit('leave', { room: room });
 			return false;
 		});
 		$('form#send_room').submit(function (event) {
